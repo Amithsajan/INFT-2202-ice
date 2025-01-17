@@ -5,62 +5,52 @@
     Date: 10th jan 2025
     Description: This is my general application script.  Functions that are required on every page should live here.
 */
+// app/list.js
 
-import { getAnimals } from './animals.service.js'; // Assuming this service provides animal data
+// app/list.js
 
-window.addEventListener('DOMContentLoaded', () => {
-  const messageBox = document.getElementById('message-box');
-  const animalsTable = document.getElementById('animals-list');
-  const tableBody = animalsTable.querySelector('tbody');
+import { getAnimals } from './animals.service.js';
 
-  function drawAnimalsTable(animals) {
-    // Check if there are any animals
-    if (animals.length > 0) {
-      messageBox.classList.add('d-none');
-      animalsTable.classList.remove('d-none');
+document.addEventListener('DOMContentLoaded', () => {
+    const messageBox = document.getElementById('message-box');
+    const animalsListTable = document.getElementById('animals-list');
+    const tableBody = animalsListTable.querySelector('tbody');
 
-      // Populate the table
-      animals.forEach((animal) => {
-        const row = tableBody.insertRow();
+    // Fetch and display the list of animals
+    getAnimals().then(drawAnimalsTable);
 
-        // Owner column
-        const ownerCell = row.insertCell();
-        ownerCell.textContent = animal.owner;
+    function drawAnimalsTable(animals) {
+        if (animals.length > 0) {
+            // Hide the message box and show the table
+            messageBox.classList.add('d-none');
+            animalsListTable.classList.remove('d-none');
 
-        // Details column
-        const detailsCell = row.insertCell();
-        detailsCell.textContent = animal.details;
+            // Add rows for each animal
+            animals.forEach(animal => {
+                const row = tableBody.insertRow();
 
-        // Controls column
-        const controlsCell = row.insertCell();
+                // Add Owner cell
+                const ownerCell = row.insertCell();
+                ownerCell.textContent = animal.owner;
 
-        // Edit button
-        const editButton = document.createElement('button');
-        editButton.textContent = 'Edit';
-        editButton.classList.add('btn', 'btn-sm', 'btn-primary', 'me-2');
-        editButton.addEventListener('click', () => {
-          alert(`Edit animal: ${animal.details}`);
-        });
-        controlsCell.appendChild(editButton);
+                // Add Details cell
+                const detailsCell = row.insertCell();
+                detailsCell.textContent = `${animal.breed}, ${animal.name}`;
 
-        // Delete button
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete';
-        deleteButton.classList.add('btn', 'btn-sm', 'btn-danger');
-        deleteButton.addEventListener('click', () => {
-          alert(`Delete animal: ${animal.details}`);
-        });
-        controlsCell.appendChild(deleteButton);
-      });
-    } else {
-      // No animals, show the message box
-      animalsTable.classList.add('d-none');
-      messageBox.classList.remove('d-none');
+                // Add Controls cell
+                const controlsCell = row.insertCell();
+                const editButton = document.createElement('button');
+                editButton.textContent = 'Edit';
+                editButton.className = 'btn btn-warning btn-sm me-2';
+                const deleteButton = document.createElement('button');
+                deleteButton.textContent = 'Delete';
+                deleteButton.className = 'btn btn-danger btn-sm';
+                controlsCell.append(editButton, deleteButton);
+            });
+        } else {
+            // Show the message box and hide the table
+            messageBox.classList.remove('d-none');
+            animalsListTable.classList.add('d-none');
+        }
     }
-  }
-
-  // Get animals from the service and draw the table
-  getAnimals().then((animals) => {
-    drawAnimalsTable(animals);
-  });
 });
